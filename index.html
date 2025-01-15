@@ -93,7 +93,7 @@
             let returnRateType = document.getElementById('returnType').value;
             let returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
             let investmentYears = parseInt(document.getElementById('investmentYears').value);
-
+            let currentView = 'annual'
             let monthlyReturnRate = returnRateType === 'yearly' ? Math.pow(1 + returnRate, 1 / 12) - 1 : returnRate;
 
             let balance = initialAmount;
@@ -126,15 +126,15 @@
             document.getElementById('annualView').classList.remove('hidden');
             document.querySelector('.view-toggle').classList.remove('hidden');
             document.querySelector('.view-toggle button').innerText = 'Switch to Detailed View';
-            window.currentTable = 'annual';
+            //window.currentTable = 'annual';
             
         }
 
         function toggleView() {
             document.getElementById('detailedView').classList.toggle('hidden');
             document.getElementById('annualView').classList.toggle('hidden');
-            document.querySelector('.view-toggle button').innerText = `Switch to ${window.currentTable == "annual" ? 'Detailed' : "Annual"} View`;
-            window.currentTable =  window.currentTable == 'annual'? 'detailed' : 'annual';
+            document.querySelector('.view-toggle button').innerText = `Switch to ${currentView == "annual" ? 'Detailed' : "Annual"} View`;
+            currentView =  currentView === 'annual'? 'detailed' : 'annual';
         }
     </script>
 </body>
