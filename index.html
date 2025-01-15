@@ -76,7 +76,7 @@
         <button onclick="calculateReturn()">Calculate</button>
 
         <div class="view-toggle hidden">
-            <button onclick="toggleView()">Toggle View</button>
+            <button onclick="toggleView()">Switch to Detailed View</button>
         </div>
 
         <div class="result hidden" id="detailedView"></div>
@@ -86,7 +86,7 @@
     <script>
         let detailedTable = '';
         let annualTable = '';
-        let currentView = 'annual'
+        let currentView = 'annual'; // הגדרת המצב הראשוני
 
         function calculateReturn() {
             let initialAmount = parseFloat(document.getElementById('initialAmount').value);
@@ -94,7 +94,7 @@
             let returnRateType = document.getElementById('returnType').value;
             let returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
             let investmentYears = parseInt(document.getElementById('investmentYears').value);
-            
+
             let monthlyReturnRate = returnRateType === 'yearly' ? Math.pow(1 + returnRate, 1 / 12) - 1 : returnRate;
 
             let balance = initialAmount;
@@ -126,16 +126,25 @@
             document.getElementById('annualView').innerHTML = annualTable;
             document.getElementById('annualView').classList.remove('hidden');
             document.querySelector('.view-toggle').classList.remove('hidden');
-            document.querySelector('.view-toggle button').innerText = 'Switch to Detailed View';
-            //window.currentTable = 'annual';
             
+            // קביעת המצב ההתחלתי של הכפתור והתצוגות
+            currentView = 'annual';
+            document.querySelector('.view-toggle button').innerText = 'Switch to Detailed View';
+            document.getElementById('detailedView').classList.add('hidden');
         }
 
         function toggleView() {
-            document.getElementById('detailedView').classList.toggle('hidden');
-            document.getElementById('annualView').classList.toggle('hidden');
-            document.querySelector('.view-toggle button').innerText = `Switch to ${currentView == "annual" ? 'Detailed' : "Annual"} View`;
-            currentView =  currentView === 'annual'? 'detailed' : 'annual';
+            if (currentView === 'annual') {
+                document.getElementById('annualView').classList.add('hidden');
+                document.getElementById('detailedView').classList.remove('hidden');
+                document.querySelector('.view-toggle button').innerText = 'Switch to Annual View';
+                currentView = 'detailed';
+            } else {
+                document.getElementById('detailedView').classList.add('hidden');
+                document.getElementById('annualView').classList.remove('hidden');
+                document.querySelector('.view-toggle button').innerText = 'Switch to Detailed View';
+                currentView = 'annual';
+            }
         }
     </script>
 </body>
