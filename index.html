@@ -22,6 +22,7 @@
             padding: 10px;
             margin: 10px 0;
             font-size: 16px;
+            box-sizing: border-box;
         }
         .result {
             margin-top: 20px;
@@ -29,6 +30,13 @@
             background-color: #e8f4e8;
             border: 1px solid #c8e6c9;
             overflow-x: auto;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s ease, opacity 0.5s ease;
+        }
+        .result.visible {
+            max-height: 1000px; /* גובה מספיק גבוה להצגת התוכן */
+            opacity: 1;
         }
         table {
             width: 100%;
@@ -47,8 +55,13 @@
             display: flex;
             justify-content: space-around;
         }
-        .hidden {
-            display: none;
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            input, button, select {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -79,8 +92,8 @@
             <button onclick="toggleView()">Switch to Detailed View</button>
         </div>
 
-        <div class="result hidden" id="detailedView"></div>
-        <div class="result hidden" id="annualView"></div>
+        <div class="result" id="detailedView"></div>
+        <div class="result" id="annualView"></div>
     </div>
 
     <script>
@@ -124,24 +137,23 @@
 
             document.getElementById('detailedView').innerHTML = detailedTable;
             document.getElementById('annualView').innerHTML = annualTable;
-            document.getElementById('annualView').classList.remove('hidden');
+            document.getElementById('annualView').classList.add('visible');
             document.querySelector('.view-toggle').classList.remove('hidden');
             
-            // קביעת המצב ההתחלתי של הכפתור והתצוגות
             currentView = 'annual';
             document.querySelector('.view-toggle button').innerText = 'Switch to Detailed View';
-            document.getElementById('detailedView').classList.add('hidden');
+            document.getElementById('detailedView').classList.remove('visible');
         }
 
         function toggleView() {
             if (currentView === 'annual') {
-                document.getElementById('annualView').classList.add('hidden');
-                document.getElementById('detailedView').classList.remove('hidden');
+                document.getElementById('annualView').classList.remove('visible');
+                document.getElementById('detailedView').classList.add('visible');
                 document.querySelector('.view-toggle button').innerText = 'Switch to Annual View';
                 currentView = 'detailed';
             } else {
-                document.getElementById('detailedView').classList.add('hidden');
-                document.getElementById('annualView').classList.remove('hidden');
+                document.getElementById('detailedView').classList.remove('visible');
+                document.getElementById('annualView').classList.add('visible');
                 document.querySelector('.view-toggle button').innerText = 'Switch to Detailed View';
                 currentView = 'annual';
             }
