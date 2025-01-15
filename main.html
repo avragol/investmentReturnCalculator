@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Return Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e8f4e8;
+            border: 1px solid #c8e6c9;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .view-toggle {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Investment Return Calculator</h2>
+        <label for="initialAmount">Initial Investment Amount:</label>
+        <input type="number" id="initialAmount" placeholder="Enter initial amount">
+
+        <label for="monthlyWithdrawal">Monthly Withdrawal:</label>
+        <input type="number" id="monthlyWithdrawal" placeholder="Enter monthly withdrawal">
+
+        <label for="returnType">Return Rate Type:</label>
+        <select id="returnType">
+            <option value="monthly">Monthly Return Rate (%)</option>
+            <option value="yearly">Yearly Return Rate (%)</option>
+        </select>
+
+        <label for="returnRate">Return Rate:</label>
+        <input type="number" id="returnRate" placeholder="Enter return rate">
+
+        <label for="investmentYears">Number of Years:</label>
+        <input type="number" id="investmentYears" placeholder="Enter number of years">
+
+        <button onclick="calculateReturn()">Calculate</button>
+
+        <div class="view-toggle hidden">
+            <button onclick="toggleView()">Toggle View</button>
+        </div>
+
+        <div class="result hidden" id="detailedView"></div>
+        <div class="result hidden" id="annualView"></div>
+    </div>
+
+    <script>
+        let detailedTable = '';
+        let annualTable = '';
+
+        function calculateReturn() {
+            let initialAmount = parseFloat(document.getElementById('initialAmount').value);
+            let monthlyWithdrawal = parseFloat(document.getElementById('monthlyWithdrawal').value);
+            let returnRateType = document.getElementById('returnType').value;
+            let returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
+            let investmentYears = parseInt(document.getElementById('investmentYears').value);
+
+            let monthlyReturnRate = returnRateType === 'yearly' ? Math.pow(1 + returnRate, 1 / 12) - 1 : returnRate;
+
+            let balance = initialAmount;
+            detailedTable = '<table><tr><th>Year</th><th>Month</th><th>Start Balance</th><th>After Withdrawal</th><th>After Interest</th></tr>';
+            annualTable = '<table><tr><th>Year</th><th>Start Balance</th><th>End Balance</th><th>Return Profit</th><th>Total Balance Change</th></tr>';
+
+            for (let year = 1; year <= investmentYears; year++) {
+                let startBalanceYear = balance;
+                let returnProfitYear = 0;
+                for (let month = 1; month <= 12; month++) {
+                    let startBalance = balance;
+                    balance -= monthlyWithdrawal;
+                    if (balance < 0) balance = 0;
+                    let afterWithdrawal = balance;
+                    let interest = balance * monthlyReturnRate;
+                    balance += interest;
+                    returnProfitYear += interest;
+                    let afterInterest = balance;
+                    detailedTable += `<tr><td>${year}</td><td>${month}</td><td>${startBalance.toFixed(2)}</td><td>${afterWithdrawal.toFixed(2)}</td><td>${afterInterest.toFixed(2)}</td></tr>`;
+                }
+                let endBalanceYear = balance;
+                let totalBalanceChange = endBalanceYear - startBalanceYear;
+                annualTable += `<tr><td>${year}</td><td>${startBalanceYear.toFixed(2)}</td><td>${endBalanceYear.toFixed(2)}</td><td>${returnProfitYear.toFixed(2)}</td><td>${totalBalanceChange.toFixed(2)}</td></tr>`;
+            }
+            detailedTable += '</table>';
+            annualTable += '</table>';
+
+            document.getElementById('detailedView').innerHTML = detailedTable;
+            document.getElementById('annualView').innerHTML = annualTable;
+            document.getElementById('annualView').classList.remove('hidden');
+            document.querySelector('.view-toggle').classList.remove('hidden');
+            document.querySelector('.view-toggle button').innerText = 'Switch to Detailed View';
+            window.currentTable = 'annual';
+            
+        }
+
+        function toggleView() {
+            document.getElementById('detailedView').classList.toggle('hidden');
+            document.getElementById('annualView').classList.toggle('hidden');
+            document.querySelector('.view-toggle button').innerText = `Switch to ${window.currentTable == "annual" ? 'Detailed' : "Annual"} View`;
+            window.currentTable =  window.currentTable == 'annual'? 'detailed' : 'annual';
+        }
+    </script>
+</body>
+</html>
