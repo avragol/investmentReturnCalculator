@@ -86,6 +86,7 @@
     <script>
         let detailedTable = '';
         let annualTable = '';
+        let currentView = 'annual'
 
         function calculateReturn() {
             let initialAmount = parseFloat(document.getElementById('initialAmount').value);
@@ -93,7 +94,7 @@
             let returnRateType = document.getElementById('returnType').value;
             let returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
             let investmentYears = parseInt(document.getElementById('investmentYears').value);
-            let currentView = 'annual'
+            
             let monthlyReturnRate = returnRateType === 'yearly' ? Math.pow(1 + returnRate, 1 / 12) - 1 : returnRate;
 
             let balance = initialAmount;
