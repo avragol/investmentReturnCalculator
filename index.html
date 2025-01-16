@@ -16,20 +16,61 @@
             margin: auto;
             padding: 20px;
             background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        input, button, select {
+        input, select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
             margin: 10px 0;
             font-size: 16px;
-            box-sizing: border-box;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        button:disabled:hover {
+            background-color: #cccccc;
+        }
+        .view-toggle {
+            margin-top: 20px;
+            display: none;
+        }
+        .view-toggle button {
+            background-color: #2196F3;
+        }
+        .view-toggle button:hover {
+            background-color: #1976D2;
         }
         .result {
             margin-top: 20px;
-            padding: 10px;
-            background-color: #e8f4e8;
-            border: 1px solid #c8e6c9;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             overflow-x: auto;
             max-height: 0;
             opacity: 0;
@@ -41,27 +82,64 @@
         }
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 15px 0;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px 15px;
             text-align: right;
+            border: none;
+            border-bottom: 1px solid #eee;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: none;
+            letter-spacing: 0.5px;
         }
-        .view-toggle {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-around;
+        tr:hover {
+            background-color: #f5f9ff;
+        }
+        td.current-balance {
+            color: #3498db;
+            font-weight: 700;
+        }
+        td.profit-positive {
+            color: #2ecc71;
+        }
+        td.profit-negative {
+            color: #e74c3c;
+        }
+        tr.summary-row {
+            background-color: #f8f9fa;
+            font-weight: 700;
+            border-top: 2px solid #eee;
+        }
+        tr.summary-row td {
+            border-bottom: none;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.8em;
+            margin-top: 4px;
+            display: none;
+        }
+        input.error {
+            border-color: #e74c3c;
         }
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
+                padding: 15px;
             }
             input, button, select {
                 font-size: 14px;
+            }
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.9em;
             }
         }
     </style>
@@ -85,11 +163,12 @@
         <input type="number" id="returnRate" placeholder="הזן שיעור תשואה">
 
         <label for="investmentYears">מספר שנים:</label>
-        <input type="number" id="investmentYears" placeholder="הזן מספר שנים">
+        <input type="text" id="investmentYears" placeholder="הזן מספר שנים (ניתן להזין שנים וחודשים, למשל: 4.11)">
+        <div id="yearsError" class="error-message">ערך לא חוקי</div>
 
-        <button onclick="calculateReturn()">חשב</button>
+        <button onclick="calculateReturn()" id="calculateButton">חשב</button>
 
-        <div class="view-toggle hidden">
+        <div class="view-toggle">
             <button onclick="toggleView()">עבור לתצוגה מפורטת</button>
         </div>
 
@@ -98,48 +177,124 @@
     </div>
 
     <script>
-        let detailedTable = '';
-        let annualTable = '';
         let currentView = 'annual';
+        
+        function validateYears() {
+            const yearsInput = document.getElementById('investmentYears');
+            const errorDiv = document.getElementById('yearsError');
+            const calculateButton = document.getElementById('calculateButton');
+            
+            if (!yearsInput.value) return true;
+            
+            const [years, months] = yearsInput.value.split('.').map(Number);
+            
+            if (years < 0 || (months && (months < 0 || months > 12))) {
+                yearsInput.classList.add('error');
+                errorDiv.style.display = 'block';
+                calculateButton.disabled = true;
+                return false;
+            } else {
+                yearsInput.classList.remove('error');
+                errorDiv.style.display = 'none';
+                calculateButton.disabled = false;
+                return true;
+            }
+        }
+
+        document.getElementById('investmentYears').addEventListener('input', validateYears);
 
         function calculateReturn() {
+            if (!validateYears()) return;
+
             let initialAmount = parseFloat(document.getElementById('initialAmount').value);
             let monthlyWithdrawal = parseFloat(document.getElementById('monthlyWithdrawal').value);
             let returnRateType = document.getElementById('returnType').value;
             let returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
-            let investmentYears = parseInt(document.getElementById('investmentYears').value);
+            
+            const yearsInput = document.getElementById('investmentYears').value;
+            let totalMonths;
 
-            let monthlyReturnRate = returnRateType === 'yearly' ? Math.pow(1 + returnRate, 1 / 12) - 1 : returnRate;
-
-            let balance = initialAmount;
-            detailedTable = '<table><tr><th>שנה</th><th>חודש</th><th>יתרת פתיחה</th><th>לאחר משיכה</th><th>לאחר תשואה</th></tr>';
-            annualTable = '<table><tr><th>שנה</th><th>יתרה בתחילת השנה</th><th>יתרה בסוף השנה</th><th>תשואה</th><th>שינוי כולל</th></tr>';
-
-            for (let year = 1; year <= investmentYears; year++) {
-                let startBalanceYear = balance;
-                let returnProfitYear = 0;
-                for (let month = 1; month <= 12; month++) {
-                    let startBalance = balance;
-                    balance -= monthlyWithdrawal;
-                    if (balance < 0) balance = 0;
-                    let afterWithdrawal = balance;
-                    let interest = balance * monthlyReturnRate;
-                    balance += interest;
-                    returnProfitYear += interest;
-                    let afterInterest = balance;
-                    detailedTable += `<tr><td>${year}</td><td>${month}</td><td>${startBalance.toFixed(2)}</td><td>${afterWithdrawal.toFixed(2)}</td><td>${afterInterest.toFixed(2)}</td></tr>`;
-                }
-                let endBalanceYear = balance;
-                let totalBalanceChange = endBalanceYear - startBalanceYear;
-                annualTable += `<tr><td>${year}</td><td>${startBalanceYear.toFixed(2)}</td><td>${endBalanceYear.toFixed(2)}</td><td>${returnProfitYear.toFixed(2)}</td><td>${totalBalanceChange.toFixed(2)}</td></tr>`;
+            if (yearsInput.includes('.')) {
+                const [years, months] = yearsInput.split('.').map(Number);
+                totalMonths = (years * 12) + (months || 0);
+            } else {
+                totalMonths = Math.floor(parseFloat(yearsInput) * 12);
             }
-            detailedTable += '</table>';
-            annualTable += '</table>';
+
+            let monthlyReturnRate = returnRateType === 'yearly' ? returnRate / 12 : returnRate;
+            
+            let balance = initialAmount;
+            let totalProfit = 0;
+            
+            let detailedTable = '<table><tr><th>שנה</th><th>חודש</th><th>יתרת פתיחה</th><th>לאחר משיכה</th><th>תשואה</th><th>יתרה נוכחית</th></tr>';
+            let annualTable = '<table><tr><th>שנה</th><th>יתרה בתחילת השנה</th><th>יתרה בסוף השנה</th><th>תשואה</th><th>שינוי כולל</th></tr>';
+
+            const startingBalance = initialAmount;
+            let currentYear = 1;
+            let yearlyProfit = 0;
+            let yearStartBalance = initialAmount;
+            
+            for (let month = 1; month <= totalMonths; month++) {
+                let startBalance = balance;
+                
+                balance -= monthlyWithdrawal;
+                if (balance < 0) balance = 0;
+                let afterWithdrawal = balance;
+                
+                let interest = balance * monthlyReturnRate;
+                balance += interest;
+                totalProfit += interest;
+                yearlyProfit += interest;
+
+                const currentYearInLoop = Math.ceil(month / 12);
+                const monthInYear = ((month - 1) % 12) + 1;
+                
+                detailedTable += `<tr>
+                    <td>${currentYearInLoop}</td>
+                    <td>${monthInYear}</td>
+                    <td>${startBalance.toFixed(2)}</td>
+                    <td>${afterWithdrawal.toFixed(2)}</td>
+                    <td class="${interest >= 0 ? 'profit-positive' : 'profit-negative'}">${interest.toFixed(2)}</td>
+                    <td class="current-balance">${balance.toFixed(2)}</td>
+                </tr>`;
+
+                if (monthInYear === 12 || month === totalMonths) {
+                    const totalBalanceChange = balance - yearStartBalance;
+                    annualTable += `<tr>
+                        <td>${currentYear}</td>
+                        <td>${yearStartBalance.toFixed(2)}</td>
+                        <td>${balance.toFixed(2)}</td>
+                        <td class="profit-positive">${yearlyProfit.toFixed(2)}</td>
+                        <td class="${totalBalanceChange >= 0 ? 'profit-positive' : 'profit-negative'}">${totalBalanceChange.toFixed(2)}</td>
+                    </tr>`;
+                    
+                    yearStartBalance = balance;
+                    yearlyProfit = 0;
+                    currentYear++;
+                }
+            }
+            
+            detailedTable += `<tr class="summary-row">
+                <td colspan="2">סיכום כולל</td>
+                <td>${startingBalance.toFixed(2)}</td>
+                <td>-</td>
+                <td class="${totalProfit >= 0 ? 'profit-positive' : 'profit-negative'}">${totalProfit.toFixed(2)}</td>
+                <td class="current-balance">${balance.toFixed(2)}</td>
+            </tr></table>`;
+
+            const totalChange = balance - startingBalance;
+            annualTable += `<tr class="summary-row">
+                <td>סיכום כולל</td>
+                <td>${startingBalance.toFixed(2)}</td>
+                <td>${balance.toFixed(2)}</td>
+                <td class="profit-positive">${totalProfit.toFixed(2)}</td>
+                <td class="${totalChange >= 0 ? 'profit-positive' : 'profit-negative'}">${totalChange.toFixed(2)}</td>
+            </tr></table>`;
 
             document.getElementById('detailedView').innerHTML = detailedTable;
             document.getElementById('annualView').innerHTML = annualTable;
             document.getElementById('annualView').classList.add('visible');
-            document.querySelector('.view-toggle').classList.remove('hidden');
+            document.querySelector('.view-toggle').style.display = 'block';
             
             currentView = 'annual';
             document.querySelector('.view-toggle button').innerText = 'עבור לתצוגה מפורטת';
