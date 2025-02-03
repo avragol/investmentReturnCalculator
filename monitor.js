@@ -3,11 +3,14 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 async function checkSiteChanges() {
-  const browser = await puppeteer.launch();
+  await sendTelegramNotification('hello world');
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
   const page = await browser.newPage();
 
   try {
-    await sendTelegramNotification('Site updated!');
+    
     // התחברות
     await page.goto('https://your-site.com/login');
     await page.type('#username', process.env.SITE_USERNAME);
