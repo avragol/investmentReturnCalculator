@@ -13,6 +13,8 @@ async function checkSiteChanges() {
     
     // התחברות
     await page.goto('https://daycareeligibilitycheck.labor.gov.il/');
+    const c = await page.content();
+    console.log("page before types: ", c)
     await page.type('#txtTZkid', process.env.SITE_txtTZkid);
     await page.type('#myDatapicker', process.env.SITE_BIRTHDAY);
     await page.type('#txtTZparents', process.env.SITE_txtTZparents);
