@@ -51,7 +51,7 @@ async function sendTelegramNotification(message) {
   const chatId = process.env.TELEGRAM_CHAT_ID;
   console.log("token", botToken)
   console.log("id", chatId)
-  console log(await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+  console.log(await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
