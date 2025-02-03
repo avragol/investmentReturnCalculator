@@ -12,18 +12,19 @@ async function checkSiteChanges() {
   try {
     
     // התחברות
-    await page.goto('https://your-site.com/login');
-    await page.type('#username', process.env.SITE_USERNAME);
-    await page.type('#password', process.env.SITE_PASSWORD);
-    await page.click('#login-button');
+    await page.goto('https://daycareeligibilitycheck.labor.gov.il/');
+    await page.type('[name="txtTZkid"]', process.env.SITE_txtTZkid);
+    await page.type('[name="myDatapicker"]', process.env.SITE_BIRTHDAY);
+    await page.type('[name="txtTZparents"]', process.env.SITE_txtTZparents);
+    await page.click('#ddlYear');
+    await page.click('#ddlYear [value="2024"]');
+    await page.click('#btnSubmit');
     
     // המתנה לטעינה
     await page.waitForNavigation();
 
-    // סריקת תוכן עמוד ספציפי
-    await page.goto('https://your-site.com/target-page');
     const content = await page.content();
-
+    console.log("content", content)
     // יצירת hash מהתוכן
     const currentHash = crypto.createHash('md5').update(content).digest('hex');
     const previousHash = fs.existsSync('last-hash.txt') 
