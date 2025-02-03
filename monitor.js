@@ -13,9 +13,9 @@ async function checkSiteChanges() {
     
     // התחברות
     await page.goto('https://daycareeligibilitycheck.labor.gov.il/');
-    await page.type('[name="txtTZkid"]', process.env.SITE_txtTZkid);
-    await page.type('[name="myDatapicker"]', process.env.SITE_BIRTHDAY);
-    await page.type('[name="txtTZparents"]', process.env.SITE_txtTZparents);
+    await page.type('#txtTZkid', process.env.SITE_txtTZkid);
+    await page.type('#myDatapicker', process.env.SITE_BIRTHDAY);
+    await page.type('#txtTZparents', process.env.SITE_txtTZparents);
     await page.click('#ddlYear');
     await page.click('#ddlYear [value="2024"]');
     await page.click('#btnSubmit');
