@@ -2,7 +2,7 @@ name: Site Change Monitor
 
 on:
   schedule:
-    # הרצה כל שעה
+    # הרצה כל 5 MINUTSה
     - cron: '*/5 * * * *'
   workflow_dispatch:
 
@@ -24,8 +24,9 @@ jobs:
     
     - name: Run monitor script
       env:
-        SITE_USERNAME: ${{ secrets.SITE_USERNAME }}
-        SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        SITE_txtTZparents: ${{ secrets.SITE_txtTZparents }}
+        SITE_BIRTHDAY: ${{ secrets.SITE_BIRTHDAY }}
+        SITE_txtTZkid: ${{ secrets.SITE_txtTZkid }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       run: node monitor.js
