@@ -3,7 +3,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 async function checkSiteChanges() {
-  await sendTelegramNotification('hello world');
+  //await sendTelegramNotification('hello world');
  /*  const browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
