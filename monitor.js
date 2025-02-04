@@ -45,7 +45,7 @@ async function checkSiteChanges() {
 
       // שליחת התראה (Telegram לדוגמה)
       await sendTelegramNotification('Site updated!'); */
-    }
+    
 
   } catch (error) {
     console.error('Error in monitor:', error);
