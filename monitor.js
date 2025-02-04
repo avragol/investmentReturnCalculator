@@ -10,7 +10,6 @@ async function checkSiteChanges() {
   const page = await browser.newPage();
 
   try {
-    
     // התחברות
     await page.goto('https://daycareeligibilitycheck.labor.gov.il/');
     const c = await page.content();
@@ -21,7 +20,7 @@ async function checkSiteChanges() {
     await page.click('#ddlYear');
     await page.click('#ddlYear [value="2024"]');
     await page.click('#btnSubmit');
-    
+
     // המתנה לטעינה
     await page.waitForNavigation();
 
@@ -29,14 +28,14 @@ async function checkSiteChanges() {
     console.log("content", content)
     // יצירת hash מהתוכן
     const currentHash = crypto.createHash('md5').update(content).digest('hex');
-    const previousHash = fs.existsSync('last-hash.txt') 
-      ? fs.readFileSync('last-hash.txt', 'utf8') 
+    const previousHash = fs.existsSync('last-hash.txt')
+      ? fs.readFileSync('last-hash.txt', 'utf8')
       : null;
 
     if (currentHash !== previousHash) {
       // שמירת hash חדש
       fs.writeFileSync('last-hash.txt', currentHash);
-      
+
       // שליחת התראה (Telegram לדוגמה)
       await sendTelegramNotification('Site updated!');
     }
@@ -54,16 +53,16 @@ async function sendTelegramNotification(message) {
   const chatId = process.env.TELEGRAM_CHAT_ID;
   console.log("token", botToken)
   console.log("id", chatId)
-  try{
-  console.log(await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: message
-    })
-  }));
-  } catch (e){console.log(e)}
+  try {
+    console.log(await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message
+      })
+    }));
+  } catch (e) { console.log(e) }
 }
 
 checkSiteChanges();
