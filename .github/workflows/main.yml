@@ -3,7 +3,7 @@ name: Site Change Monitor
 on:
   schedule:
     # הרצה כל 5 MINUTSה
-    - cron: '*/5 * * * *'
+  - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
