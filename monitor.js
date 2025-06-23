@@ -52,6 +52,19 @@ async function checkSiteChanges() {
   } finally {
     /* await browser.close(); */
   }
+  try {
+    // התחברות
+    const startTime = performance.now(); // התחלת מדידה
+    await fetch('https://first-deploy-ag-client.onrender.com/');
+    const endTime = performance.now(); // סיום מדידה
+
+    const fetchTime = (endTime - startTime).toFixed(2); // זמן במילישניות
+    await sendTelegramNotification('Cardify is alive! response time: ' + fetchTime + 'ms');
+  } catch (error) {
+    console.error('Error in monitor:', error);
+  } finally {
+    /* await browser.close(); */
+  }
 }
 
 async function sendTelegramNotification(message) {
