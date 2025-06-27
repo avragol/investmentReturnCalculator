@@ -55,7 +55,7 @@ async function checkSiteChanges() {
   try {
     // התחברות
     const startTime = performance.now(); // התחלת מדידה
-    await fetch('https://first-deploy-ag-client.onrender.com/');
+    await fetch('https://first-project-ag-server.onrender.com/api/cards/cards');
     const endTime = performance.now(); // סיום מדידה
 
     const fetchTime = (endTime - startTime).toFixed(2); // זמן במילישניות
