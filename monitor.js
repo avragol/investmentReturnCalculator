@@ -10,14 +10,14 @@ async function checkSiteChanges() {
   const page = await browser.newPage(); */
 
   try {
-    // התחברות
+    /*
     const startTime = performance.now(); // התחלת מדידה
     await fetch('https://cofeeapp.onrender.com');
     const endTime = performance.now(); // סיום מדידה
 
     const fetchTime = (endTime - startTime).toFixed(2); // זמן במילישניות
     await sendTelegramNotification('cofeeApp is alive! response time: ' + fetchTime + 'ms');
-    
+    */
    /*  await page.goto('https://daycareeligibilitycheck.labor.gov.il/');
     const c = await page.content();
     console.log("page before types: ", c)
